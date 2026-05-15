@@ -9,7 +9,7 @@ import model.TransactionHistory;
 
 public class AccountRepo {
     private Map<Integer,Account> accList = new HashMap<>();
-    private Map<Integer,TransactionHistory> accHistory = new HashMap<>();
+    private Map<Integer,List<TransactionHistory>> accHistory = new HashMap<>();
 
     public void addAccount(int id,Account account)
     {
@@ -28,11 +28,13 @@ public class AccountRepo {
 
     public void addTransactionHistory(TransactionHistory tHistory)
     {
-        accHistory.put(tHistory.getAccNo(),tHistory);
+        int accNo = tHistory.getAccNo();
+        accHistory.putIfAbsent(accNo, new ArrayList<>());
+        accHistory.get(accNo).add(tHistory);
     }
 
     public List<TransactionHistory> getAllTransaction(int accID)
     {
-        return new ArrayList<>(accHistory.values());
+        return accHistory.getOrDefault(accID,new ArrayList<>());
     }
 }

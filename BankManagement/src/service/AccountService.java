@@ -52,7 +52,10 @@ public class AccountService {
 
     public Account getAccountById(int accID)
     {
-        return accRepo.getAccountByID(accID);
+        Account account = accRepo.getAccountByID(accID);
+        if(account == null)
+            return null;
+        return (account.getAccStatus() == AccountStatus.ACTIVE)?account:null ;
     }
 
     public void addTransactionHistory(TransactionHistory tHistory)

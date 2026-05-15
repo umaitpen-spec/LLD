@@ -11,6 +11,7 @@ import model.Customer;
 import model.TransactionHistory;
 import service.AccountService;
 import service.CustomerService;
+import util.Util;
 
 public class AccountView {
     AccountService accService;
@@ -36,7 +37,7 @@ public class AccountView {
         System.out.println("9.UnBlock Account");
         System.out.println("10.Total Balance");
         System.out.println("0.Return to Main menu");
-        int choice = sc.nextInt();
+        int choice = Util.chkInteger("", sc);
         switch (choice) {
                 case 1:
                     createAccount();                    
@@ -75,15 +76,14 @@ public class AccountView {
             }
     }
 
-    private void getTotBankBalance() {
-        // TODO Auto-generated method stub        
+    private void getTotBankBalance() {     
         double totBalance = accService.getTotBankBalance();
         System.out.println("Total Balance:" + totBalance);
     }
 
     private void unBlockAccount() {
-        System.out.print("Enter the Account Number u want to Block:");
-        int accId = sc.nextInt();
+        String msg = "Enter the Account Number u want to Block:";
+        int accId = Util.chkInteger(msg, sc);
         Account acc = accService.getAccountById(accId);
         if(acc == null)
             System.out.println("Account not Valid");
@@ -95,8 +95,8 @@ public class AccountView {
     }
 
     private void blockAccount() {
-        System.out.print("Enter the Account Number u want to Block:");
-        int accId = sc.nextInt();
+        String msg = "Enter the Account Number u want to Block:";
+        int accId = Util.chkInteger(msg, sc);
         Account acc = accService.getAccountById(accId);
         if(acc == null)
             System.out.println("Account not Valid");
@@ -108,8 +108,8 @@ public class AccountView {
     }
 
     private void TransferMoney() {
-        System.out.println("Enter the FROM Account Number u want to Transfer");
-        int fromAccID = sc.nextInt();
+        String msg = "Enter the FROM Account Number u want to Transfer:";
+        int fromAccID = Util.chkInteger(msg, sc);
         Account fromAacc = accService.getAccountById(fromAccID);
         if(fromAacc == null)
             System.out.println("From Account Doesnot exists");
@@ -117,8 +117,8 @@ public class AccountView {
                 System.out.println(fromAacc.getAccountNum() + " Account Blocked");
         else
         {
-            System.out.println("Enter the TO Account Number u want to Deposit");
-            int toAccID = sc.nextInt();
+            msg = "Enter the TO Account Number u want to Deposit:";
+            int toAccID = Util.chkInteger(msg, sc);
             Account toAcc = accService.getAccountById(toAccID);
             if(toAcc == null)
                 System.out.println("To Account Doesnot exists");
@@ -126,8 +126,8 @@ public class AccountView {
                 System.out.println(toAcc.getAccountNum() + " Account Blocked");
             else
             {
-                System.out.print("Enter the amount to WithDraw from "+ fromAacc.getCustomer().getName()+ " account:");
-                int transferAmt = sc.nextInt();
+                msg = "Enter the amount to WithDraw from "+ fromAacc.getCustomer().getName()+ " account:";
+                int transferAmt = Util.chkInteger(msg, sc);
                 if(transferAmt < 0)
                     System.out.println("Amount cannot be negative");
                 else if(transferAmt > fromAacc.getBalance())
@@ -153,26 +153,29 @@ public class AccountView {
     }
 
     public void createAccount() {
-        System.out.println("Enter the customer ID to create account");
-        int custID = sc.nextInt();
+        String msg = "Enter the customer ID to create account:";
+        int custID = Util.chkInteger(msg, sc);
         Customer cust = custSrc.getCustomerById(custID);
         if(cust == null)
             System.out.println("Customer Id Invalid");
         else
         {
-            System.out.println("Do u want to create 1.Saving/2.Current Account");
+            msg  = "Do u want to create 1.Saving/2.Current Account:";
 
-            int choice = sc.nextInt();
+            int choice = Util.chkInteger(msg, sc);
             AccountType accType = null;
-            switch (choice) {
-                case 1:
-                    accType = AccountType.SAVINGS;
-                    break;
-                case 2:
-                    accType = AccountType.CURRENT;
-                    break;
-                default:
-                    System.err.println("Wrong choice!");
+            while(accType == null)
+            {
+                switch (choice) {
+                    case 1:
+                        accType = AccountType.SAVINGS;
+                        break;
+                    case 2:
+                        accType = AccountType.CURRENT;
+                        break;
+                    default:
+                        System.err.println("Wrong choice!");
+                }
             }
             accService.createAccount(cust,accType);
         }
@@ -193,8 +196,8 @@ public class AccountView {
     }
 
     public void checkBalance() {
-        System.out.println("Enter the Account ID to Check Balance");
-        int accID = sc.nextInt();
+        String msg = "Enter the Account ID to Check Balance:";
+        int accID = Util.chkInteger(msg, sc);
         double balance = accService.checkBalance(accID);
         if(balance == -1)
             System.err.println("Account Not Valid");
@@ -204,15 +207,15 @@ public class AccountView {
 
     public void depositMoney()
     {
-        System.out.println("Enter the Account ID to Deposit Money");
-        int accID = sc.nextInt();
+        String msg = "Enter the Account ID to Deposit Money:";
+        int accID = Util.chkInteger(msg, sc);
         Account acc = accService.getAccountById(accID);
         if(acc == null)
             System.out.println("Account Doesnot exists");
         else
         {
-            System.out.print("Enter the amount to deposit in "+acc.getCustomer().getName()+" Account:");
-            int amount = sc.nextInt();
+            msg = "Enter the amount to deposit in "+acc.getCustomer().getName()+" Account:";
+            int amount = Util.chkInteger(msg, sc);
             if(amount < 0)
                 System.out.println("Amount cannot be negative");
             else
@@ -231,15 +234,15 @@ public class AccountView {
 
     public void withDrawMoney()
     {
-        System.out.println("Enter the Account ID to WithDraw Money");
-        int accID = sc.nextInt();
+        String msg = "Enter the Account ID to WithDraw Money:";
+        int accID = Util.chkInteger(msg, sc);
         Account acc = accService.getAccountById(accID);
         if(acc == null)
             System.out.println("Account Doesnot exists");
         else
         {
-            System.out.print("Enter the amount to WithDraw from "+ acc.getCustomer().getName()+ " account:");
-            int amount = sc.nextInt();
+            msg = "Enter the amount to WithDraw from "+ acc.getCustomer().getName()+ " account:";
+            int amount = Util.chkInteger(msg, sc);
             if(amount < 0)
                 System.out.println("Balance cannot be negative");
             else if(amount > acc.getBalance())
@@ -258,8 +261,8 @@ public class AccountView {
     }
 
     private void getTransactionHistory() {
-        System.out.println("Enter the account number to get the TransactionHistory");
-        int accID = sc.nextInt();
+        String msg = "Enter the account number to get the TransactionHistory:";
+        int accID = Util.chkInteger(msg, sc);
         Account acc = accService.getAccountById(accID);
         if(acc == null)
             System.out.println("Account Doesnot exists");

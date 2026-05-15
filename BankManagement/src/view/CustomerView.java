@@ -24,7 +24,7 @@ public class CustomerView {
         System.out.println("4.Search Customer");
         System.out.println("5.View Customer By ID");
         System.out.println("0.Return to Main menu");
-        int choice = sc.nextInt();
+        int choice = Util.chkInteger("", sc);
 
         switch (choice) {
                 case 1:
@@ -137,14 +137,14 @@ public class CustomerView {
 
     public void  updateCustomers() {
         viewAllCustomers();
-        System.out.println("Enter the CustomerID u want to Update");
-        int custId = sc.nextInt();
+        String msg = "Enter the CustomerID u want to Update";
+        int custId = Util.chkInteger(msg, sc);
         System.out.println("Enter The field(number) u want to update");
         System.out.println("1.Name");
         System.out.println("2.Age");
         System.out.println("3.Mobile Number");
         System.out.println("4.Address");
-        int choice = sc.nextInt();
+        int choice = Util.chkInteger(" ", sc);
         sc.nextLine();
         System.out.println("Enter the details to change");
         switch (choice) {
@@ -179,7 +179,7 @@ public class CustomerView {
         }
         
         List<Customer> custList = customerService.searchByName(name);
-        if(custList == null)
+        if(custList.isEmpty())
             System.out.println("No Customer found");
         else
         {
@@ -192,8 +192,8 @@ public class CustomerView {
     }
 
     public void  viewCustomersById() {
-        System.out.println("Enter the CustomerID u want to View");
-        int custId = sc.nextInt();
+        String msg = "Enter the CustomerID u want to View";
+        int custId = Util.chkInteger(msg, sc);
         Customer cust = customerService.getCustomerById(custId);
         if(cust == null)
             System.out.println("Customer not found");

@@ -56,7 +56,7 @@ public class CustomerService {
             System.out.println("Invalid Customer");
         else
         {
-            cust.setAddress(mno);
+            cust.setMobileNumber(mno);
             System.out.println("Mobile Name Updated Successfully");
         }
     }
