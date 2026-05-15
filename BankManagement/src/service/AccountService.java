@@ -58,6 +58,11 @@ public class AccountService {
         return (account.getAccStatus() == AccountStatus.ACTIVE)?account:null ;
     }
 
+    public Account getAccountByIdIncludingBlocked(int accID)
+    {
+        return accRepo.getAccountByID(accID);
+    }
+
     public void addTransactionHistory(TransactionHistory tHistory)
     {
         accRepo.addTransactionHistory(tHistory);
@@ -79,7 +84,7 @@ public class AccountService {
     }
 
     public double getTotBankBalance() {
-        int totBalance = 0;
+        double totBalance = 0;
         for(Account acc: accRepo.getAllAccounts())
             totBalance += acc.getBalance();
         return totBalance;

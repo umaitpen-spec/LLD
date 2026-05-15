@@ -84,9 +84,9 @@ public class AccountView {
     }
 
     private void unBlockAccount() {
-        String msg = "Enter the Account Number u want to Block:";
+        String msg = "Enter the Account Number u want to UnBlock:";
         int accId = Util.chkInteger(msg, sc);
-        Account acc = accService.getAccountById(accId);
+        Account acc = accService.getAccountByIdIncludingBlocked(accId);
         if(acc == null)
             System.out.println("Account not Valid");
         else
@@ -129,9 +129,9 @@ public class AccountView {
             else
             {
                 msg = "Enter the amount to WithDraw from "+ fromAacc.getCustomer().getName()+ " account:";
-                int transferAmt = Util.chkInteger(msg, sc);
-                if(transferAmt < 0)
-                    System.out.println("Amount cannot be negative");
+                double transferAmt = Util.chkDouble(msg, sc);
+                if(transferAmt <= 0)
+                    System.out.println("Amount should be positive");
                 else if(transferAmt > fromAacc.getBalance())
                     System.out.println("Low Balance");
                 else
@@ -218,8 +218,8 @@ public class AccountView {
         {
             msg = "Enter the amount to deposit in "+acc.getCustomer().getName()+" Account:";
             double amount = Util.chkDouble(msg, sc);
-            if(amount < 0)
-                System.out.println("Amount cannot be negative");
+            if(amount <= 0)
+                System.out.println("Amount should be positive");
             else
             {
                 double currBal = accService.depositMoney(acc, amount);
@@ -245,8 +245,8 @@ public class AccountView {
         {
             msg = "Enter the amount to WithDraw from "+ acc.getCustomer().getName()+ " account:";
             double amount = Util.chkDouble(msg, sc);
-            if(amount < 0)
-                System.out.println("Balance cannot be negative");
+            if(amount <= 0)
+                System.out.println("Amount should be positive");
             else if(amount > acc.getBalance())
                 System.out.println("Low Balance");
             else
