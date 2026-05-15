@@ -44,4 +44,21 @@ public class Util
             }
         }        
     }
+    public static double chkDouble(String msg,Scanner sc)
+    {
+        double value = 0;
+        while (true) { 
+            System.out.print(msg);
+            if(sc.hasNextDouble())
+            {
+                value = sc.nextDouble();
+                return value;
+            }
+            else
+            {
+                System.out.println("Enter only numbers");
+                sc.next();
+            }
+        }        
+    }
 }

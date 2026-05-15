@@ -73,6 +73,8 @@ public class AccountView {
                     return;
                 default:
                     System.err.println("Wrong choice!");
+                    sc.nextLine();
+                    return;
             }
     }
 
@@ -160,12 +162,11 @@ public class AccountView {
             System.out.println("Customer Id Invalid");
         else
         {
-            msg  = "Do u want to create 1.Saving/2.Current Account:";
-
-            int choice = Util.chkInteger(msg, sc);
+            msg  = "Do u want to create 1.Saving/2.Current Account:";           
             AccountType accType = null;
             while(accType == null)
             {
+                int choice = Util.chkInteger(msg, sc);
                 switch (choice) {
                     case 1:
                         accType = AccountType.SAVINGS;
@@ -175,6 +176,7 @@ public class AccountView {
                         break;
                     default:
                         System.err.println("Wrong choice!");
+                        sc.nextLine();
                 }
             }
             accService.createAccount(cust,accType);
@@ -215,7 +217,7 @@ public class AccountView {
         else
         {
             msg = "Enter the amount to deposit in "+acc.getCustomer().getName()+" Account:";
-            int amount = Util.chkInteger(msg, sc);
+            double amount = Util.chkDouble(msg, sc);
             if(amount < 0)
                 System.out.println("Amount cannot be negative");
             else
@@ -242,7 +244,7 @@ public class AccountView {
         else
         {
             msg = "Enter the amount to WithDraw from "+ acc.getCustomer().getName()+ " account:";
-            int amount = Util.chkInteger(msg, sc);
+            double amount = Util.chkDouble(msg, sc);
             if(amount < 0)
                 System.out.println("Balance cannot be negative");
             else if(amount > acc.getBalance())

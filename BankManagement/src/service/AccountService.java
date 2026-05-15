@@ -38,13 +38,13 @@ public class AccountService {
     }
 
    
-    public double depositMoney(Account acc,int balance)
+    public double depositMoney(Account acc,double balance)
     {
         acc.setBalance(balance + acc.getBalance());
         return acc.getBalance();
     }
 
-    public double withDrawMoney(Account acc,int balance)
+    public double withDrawMoney(Account acc,double balance)
     {
         acc.setBalance(acc.getBalance() - balance);
         return acc.getBalance();

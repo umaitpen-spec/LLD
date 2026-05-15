@@ -46,6 +46,7 @@ public class CustomerView {
                     return;
                 default:
                     System.err.println("Wrong choice!");
+                    sc.nextLine();
         }
     }
 

@@ -4,6 +4,7 @@ import repo.AccountRepo;
 import repo.CustomerRepo;
 import service.AccountService;
 import service.CustomerService;
+import util.Util;
 import view.AccountView;
 import view.CustomerView;
 
@@ -24,7 +25,7 @@ public class App {
             System.out.println("1.Customer Service");
             System.out.println("2.Account Service");
             System.out.println("0.Exit");
-            int choice = sc.nextInt();
+            int choice = Util.chkInteger("", sc);
             switch (choice) {
                 case 1:
                     custVw.start();
