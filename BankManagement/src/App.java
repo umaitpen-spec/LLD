@@ -21,8 +21,8 @@ public class App {
        
         while (true) { 
             System.out.println("Select the service you want");
-            System.out.println("1.Customer");
-            System.out.println("2.Account");
+            System.out.println("1.Customer Service");
+            System.out.println("2.Account Service");
             System.out.println("0.Exit");
             int choice = sc.nextInt();
             switch (choice) {
