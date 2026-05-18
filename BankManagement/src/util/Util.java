@@ -11,7 +11,7 @@ public class Util
 
     public static boolean chlAge18(int age)
     {
-        return age > 18;
+        return age >= 18;
     }
 
     public static boolean chkVAlidMobileNumber(String mobnumber)

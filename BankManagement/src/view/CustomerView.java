@@ -63,7 +63,7 @@ public class CustomerView {
 
     public int validAge()
     {
-        String msg = "Enter the Age(age>18):";   
+        String msg = "Enter the Age(age>=18):";   
         int age = 0;     
         while (true) { 
             age = Util.chkInteger(msg, sc);

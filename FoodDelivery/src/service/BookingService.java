@@ -1,7 +1,6 @@
 package service;
 
 import enumeration.orderStatus;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -19,148 +18,102 @@ public class BookingService {
         this.dBrepo = dBrepo;
     }
 
-    public void makeBooking(Customer cust, Restaurent rest, Location loc,int time) {
-        Location cusLocation = loc;
-        Location restLocation = rest.getRestLocation();
+    public void makeBooking(Customer cust, Restaurent rest, int time) {
+        Location custLoc = cust.getLocation();
+        Location restLoc = rest.getRestLocation();
         List<DeleiveryExceutive> deList = dBrepo.getDeList();
-        LocalTime orderTime = LocalTime.of(time,0);
-        List<DeleiveryExceutive> dbList =  dBrepo.getDeList();
-        DeleiveryExceutive assignedDe = null;
+        LocalTime orderTime  = LocalTime.of(time, 0);
         Booking newBooking = new Booking(cust.getCustomerId(),
-        cusLocation,LocalDate.now(),
-        orderTime,
-        0,
-        orderStatus.BOOKED);
-
-        Booking combinedBooking = null;
-        boolean isCombinedBooking = false;
-        for(DeleiveryExceutive de:dbList)
+                restLoc,
+                null,
+                orderTime ,
+                0,
+                orderStatus.BOOKED);
+        
+        boolean isCombined = false;
+        Booking comBooking = null;
+        DeleiveryExceutive assginedDE = null;
+        for(DeleiveryExceutive de:deList)
         {
-            combinedBooking = canMergeBooking(cusLocation,orderTime,de);
-            if(combinedBooking != null)
+            Booking bk = canCombineBooking(de,orderTime,custLoc);
+            if(bk != null)
             {
-                isCombinedBooking = true;
-                assignedDe = de;
+                isCombined = true;
+                comBooking = bk;
+                assginedDE = de;
                 break;
             }
         }
-        if(assignedDe == null)
+
+        if(assginedDE == null)
         {
-            for(DeleiveryExceutive de:dbList)
+            for(DeleiveryExceutive de:deList)
             {
                 if(isAvailable(de,orderTime) && 
-                (assignedDe == null || de.getdCharge() < assignedDe.getdCharge()))
-                    assignedDe = de;
+                (assginedDE == null || de.getdCharge() <  assginedDE.getdCharge()))
+                {
+                    assginedDE = de;
+                }
             }
         }
 
-        if(assignedDe == null)
+        if(assginedDE == null)
         {
-            System.out.println("No Deleivery Executives Available");
+            System.out.println("No DeleiveryExceutive Available!");
             return;
         }
-        assignedDe.getDeliveryList().add(newBooking);
+
+        double totCost = newBooking.getTotCost();
+        newBooking.setTotCost(isCombined?totCost+5:totCost+50);
+
+        assginedDE.getDeliveryList().add(newBooking);
         cust.getOrderList().add(newBooking);
-        assignedDe.setCurrLocation(cusLocation);
+        assginedDE.setCurrLocation(custLoc);
 
-        if(isCombinedBooking)
-        {
-            assignedDe.setdCharge(assignedDe.getdCharge()+5);
-        }
-        else
-        {
-            assignedDe.setdCharge(assignedDe.getdCharge()+50);
-            assignedDe.setAllowance(assignedDe.getAllowance()+10);
-        }
+        if(!isCombined)
+            assginedDE.setAllowance(assginedDE.getAllowance()+5);
 
-        newBooking.setTotCost(isCombinedBooking?5:50);
-
-        String availableExecutive = getAvailableExcecutives(deList,cusLocation,orderTime);
-        String delChargeEarned = getdelCahrgeEarned(deList);
-
-        System.out.println("Booking ID:"+newBooking.getBookingId());
-        System.out.println("Available Executives:" + availableExecutive);
-        System.out.println("Deleivery Charges Earned:" + delChargeEarned);
-        System.out.println("Alloted Delivery Excecutive:"+ assignedDe.getDeName());
+        System.out.println("Output Booking ID: " + newBooking.getBookingId());
+        //System.out.println("Available Executives: " + availableExecutiveNames);
+        //System.out.println("Delivery Charge Earned: " + deliveryChargeDetails);
+        System.out.print("Allotted Delivery Executive: " + assginedDE.getDeName());
     }
 
-    private Booking canMergeBooking(Location cusLocation, LocalTime orderTime,DeleiveryExceutive de) {
-       
-        int totOrderCount = 0;
-        Booking combinedBooking = null;
-       
-        List<Booking> bookingList = de.getDeliveryList();
-        for(Booking bk:bookingList)
+    private Booking canCombineBooking(DeleiveryExceutive de, LocalTime orderTime,Location cLocation) {
+        int orderCount = 0;
+        Booking latestBooking = null;
+        for(Booking bk: de.getDeliveryList())
         {
-            if(isSameLocation(bk.getDestinationPt(),cusLocation) && 
-                withInminutes(bk.getOrderTime(), orderTime, 15))
+            if(isSameLocation(de.getCurrLocation(),cLocation) && isWithinTime(bk.getOrderTime(),orderTime,15))
             {
-                totOrderCount++;
-                if(combinedBooking == null || 
-                    bk.getOrderTime().isAfter(combinedBooking.getOrderTime())
-                )
-                {
-                    combinedBooking = bk;
-                }
-
-            }
+                orderCount++;
+                if(latestBooking == null ||
+                    bk.getOrderTime().isAfter(orderTime) )
+                    latestBooking = bk;
+            }                
         }
-            if(totOrderCount > 0 && totOrderCount < 5)
-                return combinedBooking;        
-        
-            return null;
+        if(orderCount > 0 && orderCount < 5)
+            return latestBooking;
+        return null;
     }
 
-    private boolean withInminutes(LocalTime oldTime,LocalTime newTime,int min)
-    {
+    private boolean isSameLocation(Location currLocation, Location cLocation) {
+        return currLocation != null && cLocation != null && currLocation == cLocation;
+    }
+
+    private boolean isWithinTime(LocalTime oldTime, LocalTime newTime,int min) {
         long diff = ChronoUnit.MINUTES.between(oldTime, newTime);
         if(diff > 0 && diff < min)
             return true;
         return false;
     }
 
-    private boolean isSameLocation(Location sLoc,Location dLoc)
-    {
-        return (sLoc != null && dLoc != null && sLoc == dLoc);
-    }
-    
-    private boolean isAvailable(DeleiveryExceutive de,LocalTime time)
-    {
+    private boolean isAvailable(DeleiveryExceutive de, LocalTime orderTime) {
         for(Booking bk:de.getDeliveryList())
         {
-            if(isTripInProgress(bk.getOrderTime(),time))
+            if(isWithinTime(bk.getOrderTime(), orderTime, 30))
                 return false;
         }
         return true;
-    }
-
-    private boolean isTripInProgress(LocalTime oldTime, LocalTime newTime) {
-        long diff = ChronoUnit.MINUTES.between(oldTime, newTime);
-        if(diff >0 && diff < 30)
-            return true;
-        return false;
-    }
-
-    private String getAvailableExcecutives(List<DeleiveryExceutive> deList, 
-        Location destination, LocalTime orderTime)
-    {
-        String names = "";
-        for(DeleiveryExceutive de:deList)
-        {
-            if(isAvailable(de, orderTime))
-                names += names.isEmpty()?de.getDeName():","+de.getDeName();
-
-        }
-        return names.isEmpty()?"None":names;
-    }
-
-    private String getdelCahrgeEarned(List<DeleiveryExceutive> deList) {
-        String names = "";
-        for(DeleiveryExceutive de:deList)
-        {
-            names += names.isEmpty()?"":",";
-            names += de.getDeName()+","+de.getdCharge();
-        }
-        return names.isEmpty()?"None":names;
     }
 }

@@ -18,7 +18,7 @@ public class App {
         DEService deSrc = new DEService(dBrepo);
         BookingService bSrc = new BookingService(dBrepo);
         RestaurentService rSrc = new RestaurentService(dBrepo,lSrc);
-        BookingView bVw = new BookingView(bSrc,customerService,lSrc,rSrc, sc);
+        BookingView bVw = new BookingView(bSrc,customerService,rSrc, sc);
         System.out.println("Seed Data:");
         System.out.println("Customers: 2000-2004");
         System.out.println("Restaurants: 5000-5004");
