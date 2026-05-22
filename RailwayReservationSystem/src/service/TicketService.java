@@ -187,106 +187,81 @@ public class TicketService {
     public String cancelBooking(int tkId) {
         Ticket ticket = dbRepo.getTicketById(tkId);
         if(ticket == null)
-            return "Ticket not found";
-
+            return "Ticket Not Valid";
         for(Passenger passenger:ticket.getPassList())
         {
             Seat cancelledSeat = passenger.getSeat();
             if(cancelledSeat == null)
                 continue;
-
-            SeatType cancelledSeatType = cancelledSeat.getSeatType();
-            removePassengerFromSeat(passenger, cancelledSeat);
-            passenger.setSeat(null);
-
-            if(cancelledSeatType == SeatType.RAC)
-            {
-                moveWTToRAC(cancelledSeat);
-            }
-            else if(cancelledSeatType == SeatType.WT)
-            {
-                cancelledSeat.setBooked(false);
-            }
-            else
-            {
-                Seat freedRACSeat = moveRACToConfirmed(cancelledSeat);
+            if(null == cancelledSeat.getSeatType()) {
+                Seat freedRACSeat = moveRACToCF(cancelledSeat);
                 if(freedRACSeat != null)
-                    moveWTToRAC(freedRACSeat);
+                    moveWTToRAC(freedRACSeat,passenger);
+            } else switch (cancelledSeat.getSeatType()) {
+                case WT -> cancelledSeat.setBooked(false);
+                case RAC -> moveWTToRAC(cancelledSeat,passenger);
+                default -> {
+                    Seat freedRACSeat = moveRACToCF(cancelledSeat);
+                    if(freedRACSeat != null)
+                        moveWTToRAC(freedRACSeat,passenger);
+                }
             }
         }
-        dbRepo.removeTicket(ticket);
-        return "Ticket Cancelled";
+        return "Ticket cancelled!!";
     }
 
-    private Seat moveRACToConfirmed(Seat confirmedSeat) {
-        Seat racSeat = getFirstSeatWithPassenger(dbRepo.getAllRACSeat());
-        if(racSeat == null)
-            return null;
+    
 
-        Passenger racPassenger = racSeat.getPassenger().remove(0);
-        assignPassengerToConfirmedSeat(racPassenger, confirmedSeat);
-        updateRACSeatStatus(racSeat);
-        return racSeat;
-    }
+    private void moveWTToRAC(Seat racSeat,Passenger passenger) {
+        //remove RAC
+        racSeat.getPassenger().remove(passenger);
+        if(racSeat.getPassenger() == null)
+            racSeat.setBooked(false);
 
-    private void moveWTToRAC(Seat racSeat) {
-        Seat wtSeat = getFirstSeatWithPassenger(dbRepo.getAllWTSeat());
+        //get WT  free seat
+        Seat wtSeat = getFirstBookedSeat(dbRepo.getAllWTSeat());
+
         if(wtSeat == null)
             return;
 
-        Passenger wtPassenger = wtSeat.getPassenger().remove(0);
-        if(racSeat.getPassenger() == null)
-            racSeat.setPassenger(new ArrayList<>());
-        racSeat.getPassenger().add(wtPassenger);
-        wtPassenger.setSeat(racSeat);
-        updateRACSeatStatus(racSeat);
-        clearSeatIfEmpty(wtSeat);
+        //move wt passenger to RAC
+        Passenger pass = wtSeat.getPassenger().remove(0);
+        Seat rac = getFirstFreeSeat(dbRepo.getAllRACSeat());
+        if(rac.getPassenger() == null)
+            rac.setPassenger(new ArrayList<>());
+        rac.getPassenger().add(pass);
+        
     }
 
-    private Seat getFirstSeatWithPassenger(List<Seat> seats) {
-        for(Seat seat:seats)
-        {
-            if(seat.getPassenger() != null && !seat.getPassenger().isEmpty())
+    private Seat moveRACToCF(Seat CFSeat) {
+        //Remove CF
+        CFSeat.getPassenger().remove(0);
+
+        Seat seat = getFirstBookedSeat(dbRepo.getAllRACSeat());
+        if(seat == null)
+            return null;
+        Passenger passrac = seat.getPassenger().remove(0);
+
+        Seat setseat = getFirstFreeSeat(dbRepo.getAllCBSeat());
+
+        if(setseat.getPassenger() == null)
+            setseat.setPassenger(new ArrayList<>());
+        seat.getPassenger().add(passrac);
+
+        return CFSeat;
+    }
+
+    private Seat getFirstBookedSeat(List<Seat> allSeat) {
+        for(Seat seat:allSeat)
+            if(seat.isBooked())
                 return seat;
-        }
         return null;
     }
 
-    private void assignPassengerToConfirmedSeat(Passenger passenger, Seat seat) {
-        List<Passenger> pList = new ArrayList<>();
-        pList.add(passenger);
-        seat.setPassenger(pList);
-        seat.setBooked(true);
-        passenger.setSeat(seat);
-    }
-
-    private void removePassengerFromSeat(Passenger passenger, Seat seat) {
-        if(seat.getPassenger() != null)
-        {
-            seat.getPassenger().remove(passenger);
-            clearSeatIfEmpty(seat);
-        }
-        else
-        {
-            seat.setBooked(false);
-        }
-    }
-
-    private void clearSeatIfEmpty(Seat seat) {
-        if(seat.getPassenger() == null || seat.getPassenger().isEmpty())
-        {
-            seat.setPassenger(null);
-            seat.setBooked(false);
-        }
-    }
-
-    private void updateRACSeatStatus(Seat seat) {
-        if(seat.getPassenger() == null || seat.getPassenger().isEmpty())
-        {
-            seat.setPassenger(null);
-            seat.setBooked(false);
-            return;
-        }
-        seat.setBooked(seat.getPassenger().size() == 2);
+    private Seat getFirstFreeSeat(List<Seat> allSeat) {
+        for(Seat seat:allSeat)
+            if(!seat.isBooked())
+                return seat;
+        return null;
     }
 }
