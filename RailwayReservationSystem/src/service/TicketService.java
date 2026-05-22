@@ -209,7 +209,6 @@ public class TicketService {
         }
         return "Ticket cancelled!!";
     }
-
     
 
     private void moveWTToRAC(Seat racSeat,Passenger passenger) {
