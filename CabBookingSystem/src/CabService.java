@@ -60,13 +60,11 @@ public class CabService {
               // System.out.println("View Booking History");
                System.out.println("0.Return to Main Menu");
                switch (choice) {
-                   case 1:
-                       cabHistory(currDriver);
-                       break;
-                    case 0:
-                        return;
-                   default:
-                       System.out.println("Wrong Choice");
+                   case 1 -> cabHistory(currDriver);
+                    case 0 -> {
+                }
+
+                   default -> System.out.println("Wrong Choice");
                }
         }
     }
