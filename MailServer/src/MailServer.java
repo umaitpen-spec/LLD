@@ -1,12 +1,13 @@
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class MailServer {
-    Scanner sc = new Scanner(System.in);
-    MailView mailVw = new MailView(sc);
-    DBrepo dBrepo = new DBrepo();
-    public void start()
+   
+    public void start() throws SQLException
     {
+        Scanner sc = new Scanner(System.in);
+        MailView mailVw = new MailView(sc);
         while (true) { 
             System.out.println("Enter the option of ur choice");
             System.out.println("1.Register User");

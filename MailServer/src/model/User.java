@@ -5,12 +5,18 @@ public class User {
     private String email;
     private String password;
     private static int user = 1;
+
     public User(String email,String password) {
         this.userId = user++;
         this.email = email;
         this.password = password;
     }
 
+    public User(int userId,String email,String password) {
+        this.userId = userId;
+        this.email = email;
+        this.password = password;
+    }
 
     public String getPassword() {
         return password;

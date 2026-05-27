@@ -21,6 +21,16 @@ public class Email {
         this.status = status;
         this.timestamp = LocalDateTime.now();
     }
+    public Email(int emailId, User senderId, User receiverId, String subject, String message, 
+        int statusId, LocalDateTime dateTime) {
+         this.emailId = emailId;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.subject = subject;
+        this.message = message;
+        this.status = Status.getValue(statusId);
+        this.timestamp = dateTime;
+    }
     public int getEmailId() {
         return emailId;
     }

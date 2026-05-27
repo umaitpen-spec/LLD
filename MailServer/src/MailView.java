@@ -1,12 +1,8 @@
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
-
-import javax.swing.text.View;
 
 import model.Email;
 import model.Status;
@@ -22,37 +18,62 @@ public class MailView{
 
     Scanner sc;
     User currUser = null;
-    private Map<String,User> userList = new HashMap<>();
-    private List<Email> emailList = new ArrayList<>();
-    public MailView(Scanner sc) {
+    DBRepo dbRepo;
+    //private Map<String,User> userList;
+     private List<User> userList;
+    private List<Email> emailList;
+    //private List<Email> emailList = new ArrayList<>();
+    public MailView(Scanner sc) throws  SQLException{
         this.sc = sc;
+        dbRepo = new DBRepo();
+        userList = dbRepo.getUser();
+        emailList = dbRepo.getEmail();
     }
 
-    public void registerUser() {
+    public void registerUser() throws SQLException{
         System.out.println("Enter the deatils to Register");
         System.out.print("Enter Email(UserName):");
         String name = sc.next();
         System.out.print("Enter Password:");
         String email = sc.next();
         User user = new User(name, email);
-        userList.put(user.getEmail(),user);
+        //userList.put(user.getEmail(),user);
+        dbRepo.insertUser(user);
+        userList.add(user);
         System.out.println("User Registered Sucsessfully!!!");
     }
 
-    public void loginUser() {
+    public User findUserByEmail(String email)
+    {
+        for(User user:userList)
+            if(user.getEmail().equals(email))
+                return user;
+        return null;
+    }
+
+     public User chkPassword(String email,String password)
+    {
+        for(User user:userList)
+            if(user.getEmail().equals(email) && user.getPassword().equals(password))
+                return user;
+        return null;
+    }
+
+    public void loginUser() throws SQLException{
         System.out.print("Enter the UserName:");
         currUser = null;
         String email = sc.next();
-        if(userList.get(email) == null)
+        if(findUserByEmail(email) == null)
             System.out.println("UserName Does Not exist");
         else
         {
             System.err.print("Enter The Password:");
             String password = sc.next();
-            if(password.equals(userList.get(email).getPassword()))
+            User user = chkPassword(email,password);
+            if(user != null)
             {
                 System.out.println("User Logged In Sucessfully!!");
-                currUser = userList.get(email);
+                currUser = user;
                 startLoginUser();
             }
             else
@@ -60,7 +81,7 @@ public class MailView{
         }
     }
 
-    public void startLoginUser()
+    public void startLoginUser () throws SQLException
     {
         while (true) { 
             System.out.println("Select one of the Option");
@@ -104,54 +125,64 @@ public class MailView{
         }        
     }
 
-    private void viewInbox() {
+    private void viewInbox() throws SQLException{
         System.out.println("My Emails");
+        emailList = dbRepo.getEmail();
         List<Email> inbox = emailList.stream()
-                            .filter(a->a.getReceiverId().equals(currUser))
+                            .filter(a->a.getReceiverId().getEmail().equals(currUser.getEmail()))
                             .collect(Collectors.toList());
         for(Email email:inbox)
             System.out.println(email);
         
     }
 
-    private void markEmailRead() {
+    private void markEmailRead() throws SQLException{
+        emailList = dbRepo.getEmail();
         viewInbox();        
-        int num = util.chkUser("Enter the emailId to want to mark as read:", sc);
+        int emailId = util.chkUser("Enter the emailId to want to mark as read:", sc);
         Email email = emailList.stream()
-                        .filter(a->a.getEmailId() == num)
+                        .filter(a->a.getEmailId() == emailId)
                         .findFirst().get();
         email.setStatus(Status.READ);
+        dbRepo.updateEmailStatus(emailId,Status.READ.getValue());
     }
 
-    private void viewSendMail() {
+    private void viewSendMail() throws  SQLException{
         System.out.println("My Emails");
+        emailList = dbRepo.getEmail();
         List<Email> inbox = emailList.stream()
-                            .filter(a->a.getSenderId().equals(currUser))
+                            .filter(a->a.getSenderId().getEmail().equals(currUser.getEmail()))
                             .collect(Collectors.toList());
+        System.out.println(inbox.size());
         for(Email email:inbox)
             System.out.println(email);
     }
 
-    private void markEmailUnread() {
+    private void markEmailUnread() throws SQLException{
+        emailList = dbRepo.getEmail();
         viewInbox();        
-        int num = util.chkUser("Enter the emailId to want to mark as UNread:", sc);
+        int emailId = util.chkUser("Enter the emailId to want to mark as UNread:", sc);
         Email email = emailList.stream()
-                        .filter(a->a.getEmailId() == num)
+                        .filter(a->a.getEmailId() == emailId)
                         .findFirst().get();
         email.setStatus(Status.UNREAD);
+        dbRepo.updateEmailStatus(emailId,Status.UNREAD.getValue());
     }
 
-    private void deleteEmail() {
+    private void deleteEmail() throws SQLException{
+        emailList = dbRepo.getEmail();
         viewInbox();        
-        int num = util.chkUser("Enter the emailId to want to Delete:", sc);
+        int emailId = util.chkUser("Enter the emailId to want to Delete:", sc);
         Email email = emailList.stream()
-                        .filter(a->a.getEmailId() == num)
+                        .filter(a->a.getEmailId() == emailId)
                         .findFirst().get();
         email.setStatus(Status.DELETE);
+        dbRepo.updateEmailStatus(emailId,Status.DELETE.getValue());
     }
 
-    private void search() {
+    private void search() throws SQLException{
         String msg = "Enter how to want to Search 1.Subject 2.Sender 3.Keyword in message:";
+        emailList = dbRepo.getEmail();
         int choice = util.chkUser(msg, sc);
         switch (choice) {
             case 1:
@@ -167,12 +198,12 @@ public class MailView{
                 System.out.println("Wrong choice!!!");
         }
     }
-    private void sendEmail() {
+    private void sendEmail() throws SQLException{
         User rUser = null;
         while (rUser == null) { 
             System.out.print("Enter receiver email:");
             String remail = sc.next();
-            rUser = userList.get(remail);
+            rUser = findUserByEmail(remail);
         }
         
         System.out.print("Enter the subject:");
@@ -181,6 +212,7 @@ public class MailView{
         String message = sc.next();
         Email email = new Email(currUser, rUser, subject, message, Status.SENT);
         emailList.add(email);
+        dbRepo.insertEmail(emailList.get(emailList.size()-1));
         System.out.println("Email sent Successfully");
     }
 
