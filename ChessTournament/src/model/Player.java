@@ -12,6 +12,15 @@ public class Player {
         this.playerName = playerName;
         this.country = country;
     }
+    
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
+
     public String getPlayerName() {
         return playerName;
     }
@@ -31,5 +40,11 @@ public class Player {
         this.country = country;
     }
 
+    @Override
+    public String toString() {
+        return "Player [playerId=" + playerId + ", playerName=" + playerName + ", rating=" + rating + ", country="
+                + country + "]";
+    }
+    
     
 }

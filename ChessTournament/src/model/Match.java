@@ -1,13 +1,24 @@
 package model;
 
-import java.util.List;
-
 public class Match {
     private int matchId;
-    private List<Player> playerList;
+    private Player whitePlayer;
+    private Player blackPlayer;
     private Player winner;
     private int match = 1;
     
+    public Player getWhitePlayer() {
+        return whitePlayer;
+    }
+    public void setWhitePlayer(Player whitePlayer) {
+        this.whitePlayer = whitePlayer;
+    }
+    public Player getBlackPlayer() {
+        return blackPlayer;
+    }
+    public void setBlackPlayer(Player blackPlayer) {
+        this.blackPlayer = blackPlayer;
+    }
     public Match() {
         this.matchId = match++;
     }
@@ -17,17 +28,16 @@ public class Match {
     public void setMatchId(int matchId) {
         this.matchId = matchId;
     }
-    public List<Player> getPlayerList() {
-        return playerList;
-    }
-    public void setPlayerList(List<Player> playerList) {
-        this.playerList = playerList;
-    }
     public Player getWinner() {
         return winner;
     }
     public void setWinner(Player winner) {
         this.winner = winner;
+    }
+    @Override
+    public String toString() {
+        return "Match [whitePlayer=" + whitePlayer.getPlayerName() + ", blackPlayer=" + blackPlayer.getPlayerName() 
+        + ", winner=" + (winner==null) != null?null:winner.getPlayerName() + "]";
     }
 
     

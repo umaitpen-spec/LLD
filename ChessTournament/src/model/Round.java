@@ -22,7 +22,5 @@ public class Round {
     }
     public void setMatchList(List<Match> matchList) {
         this.matchList = matchList;
-    }
-
-    
+    }    
 }

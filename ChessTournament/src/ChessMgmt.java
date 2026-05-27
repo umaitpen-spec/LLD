@@ -7,13 +7,16 @@ public class ChessMgmt {
     ChessVw chessvw = new ChessVw(sc);
    
     public void start() {
+        while (true){
         System.out.println("Enter the option");
         System.out.println("1.Create Player");
+
         System.out.println("2.Register Player to Tournament");
         System.out.println("3.Create Rounds");
         System.out.println("4.Record Match Result");
         System.out.println("5.Display All Matches Player");
         System.out.println("6.Declare Winner");
+        System.out.println("7.Create Tournament");
         int choice = util.chkInteger("",sc);
         switch (choice) {
             case 1:
@@ -34,6 +37,9 @@ public class ChessMgmt {
             case 6:
                 chessvw.declareWinner();
                 break;
+            case 7:
+                chessvw.createTournment();
+                break;
             case 0:
                 System.out.println("Bye");
                 System.exit(0);
@@ -41,4 +47,5 @@ public class ChessMgmt {
                 System.out.println("Wrong Choice!!!");
         }
     }
+}
 }

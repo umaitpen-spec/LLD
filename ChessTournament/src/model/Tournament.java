@@ -9,7 +9,7 @@ public class Tournament {
     private LocalDate starDate;
     private LocalDate endDate;
     private List<Round> roundList;
-
+    private List<Player> playerList;
     private int tournament = 1;
 
     
@@ -68,5 +68,20 @@ public class Tournament {
     public void setTournament(int tournament) {
         this.tournament = tournament;
     }
+
+    @Override
+    public String toString() {
+        return "Tournament [tournamentId=" + tournamentId + ", tournamentName=" + tournamentName + ", starDate="
+                + starDate + ", endDate=" + endDate + ", roundList=" + roundList + "]";
+    }
+
+    public List<Player> getPlayerList() {
+        return playerList;
+    }
+
+    public void setPlayerList(List<Player> playerList) {
+        this.playerList = playerList;
+    }
+    
     
 } 
