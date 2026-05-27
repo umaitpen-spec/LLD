@@ -115,8 +115,28 @@ public class ChessVw {
     }
 
     public void recordResult() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'recordResult'");
+        viewTouramentList();
+        System.out.print("Enter the TournamentId :");
+        int tId = sc.nextInt();
+        Tournament tournament = getTourmentById(tId);
+        if(tournament == null)
+            System.out.println("Invalid Tournament");
+        else
+        {
+            int n = tournament.getRoundList().size();
+            Round round = tournament.getRoundList().get(n-1);
+            System.out.println(round);
+            String msg = "Select the Match u want to record result";
+            int mId = util.chkInteger(msg, sc);
+            msg = "Select 1.White Player / 2.Black Player";
+            int pId = util.chkInteger(msg, sc);
+            Match match = getMatchById(mId);
+            if(pId == 1)
+                match.setWinner(match.getWhitePlayer());
+            else
+                match.setWinner(match.getBlackPlayer());
+            System.out.println("Result Recorded Successfully!!!");
+        }
     }
 
     public void displayAllMatchesByPlayer() {
@@ -134,8 +154,26 @@ public class ChessVw {
     }
 
     public void declareWinner() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'declareWinner'");
+        viewTouramentList();
+        System.out.println("Enter the TournamentId u want to create :");
+        int tId = sc.nextInt();
+        Tournament tournament = getTourmentById(tId);
+        if(tournament == null)
+            System.out.println("Invalid Tournament");
+        else
+        {
+            int n = tournament.getRoundList().size();
+            Round round = tournament.getRoundList().get(n-1);
+            if(round.getMatchList().size() == 1)
+            {
+                int m = round.getMatchList().size();
+                Match match = round.getMatchList().get(m-1);
+                System.out.println("Tournament Winner:"+match.getWinner().getPlayerName());
+            }
+            else
+                System.out.println("Cant declare the Winner");
+        }
+        
     }
 
     public void createTournment() {
@@ -180,6 +218,13 @@ public class ChessVw {
         for(Player player:playerList.values())
             if(player.getPlayerId() == pId)
                 return player;
+        return null;
+    }
+
+    private Match getMatchById(int mId) {
+        for(Match match:matchList.values())
+            if(match.getMatchId() == mId)
+                return  match;
         return null;
     }
 }
