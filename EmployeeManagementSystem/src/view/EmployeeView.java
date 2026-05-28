@@ -1,12 +1,13 @@
+package view;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import model.Employee;
+import service.EmployeeService;
 
 public class EmployeeView {
 
@@ -31,7 +32,7 @@ public class EmployeeView {
         }
     }
 
-    void filterDUpdateEmployees() {
+    public void filterDUpdateEmployees() {
         viewEmployees();
         filterList = employeeService.getAllEmpList();
         while(true)
@@ -62,12 +63,18 @@ public class EmployeeView {
                     default:
                         System.out.println("Wrong Choice!!!");
                 }
-                System.out.println("Do u want to continue. (y/n)");
-                String t = sc.next();
-                if(t.equals("n"))                    
+                if(!filterList.isEmpty())
                 {
-                    updateEmployees();
+                    System.out.println("Do u want to continue. (y/n)");
+                    String t = sc.next();
+                    if(t.equals("n"))                    
+                    {
+                        updateEmployees();
+                    }
                 }
+                else
+                    return;
+              
             }
             catch(InputMismatchException ex)
             {
@@ -129,34 +136,32 @@ public class EmployeeView {
                     break;
             
         }
+        
         displayFilterEmp();
     }
 
     public void displayFilterEmp()
     {
-        String bold = "\033[1m";
-        String reset = "\033[0m";
-
-         String str = String.format("%-10s %-20s %-10s %-20s %-20s %-20s","EmployeeId" , "EmployeeName" ,"Age","Department" 
-         ,"Designation" ,"Manager");
-        System.out.println(bold + str + reset);
-        for(Employee employee: filterList)
+        if(!filterList.isEmpty())
         {
-            System.out.println(employee);
+            String bold = "\033[1m";
+            String reset = "\033[0m";
+
+            String str = String.format("%-10s %-20s %-10s %-20s %-20s %-20s","EmployeeId" , "EmployeeName" ,"Age","Department" 
+            ,"Designation" ,"Manager");
+            System.out.println(bold + str + reset);
+            for(Employee employee: filterList)
+            {
+                System.out.println(employee);
+            }                                       
         }
+        else
+            System.out.println("No Datas Found");
+      
     }
 
      public void filterString(int choice) {
-
-        Map<String, Function<Employee, Object>> getters = Map.of(
-        "Name", Employee::getEmployeeName,
-        "Department", Employee::getDepartment,
-        "Designation", Employee::getDesignation,
-        "ReportingTo", Employee::getReportingTo);
-    
-
         String field;
-
         if (choice == 1)                 
             field = "Name";                
         else if(choice == 3)
@@ -171,7 +176,7 @@ public class EmployeeView {
             return;
         }
         
-        System.out.print("Enter the "+field);
+        System.out.print("Enter the "+field+":");
         String  text = sc.next();
         System.out.println("Enter the filter Options");
         System.out.println("1.Equal");
@@ -184,34 +189,23 @@ public class EmployeeView {
         
         switch (filterChoice) {
                 case 1:
-                    filterList = filterList.stream()
-                            .filter(emp -> ((String)getters.get(field).apply(emp)).equals(text))
-                            .collect(Collectors.toList());
+                    filterList = employeeService.getEqualList(filterList,field,text);                    
                     break;
                 case 2:
-                    filterList = filterList.stream()
-                            .filter(emp -> !((String)getters.get(field).apply(emp)).equals(text))
-                            .collect(Collectors.toList());
+                    filterList = employeeService.getNotEqualList(filterList,field,text); 
+                   
                     break;
                 case 3:
-                    filterList = filterList.stream()
-                            .filter(emp -> ((String)getters.get(field).apply(emp)).contains(text))
-                            .collect(Collectors.toList());
+                    filterList =  employeeService.getContainsList(filterList,field,text); 
                     break;
                 case 4:
-                            filterList = filterList.stream()
-                            .filter(emp -> !((String)getters.get(field).apply(emp)).contains(text))
-                            .toList();
+                    filterList =  employeeService.getNotContainsList(filterList,field,text);                              
                     break;
                 case 5:
-                     filterList = filterList.stream()
-                            .filter(emp -> ((String)getters.get(field).apply(emp)).startsWith(text))
-                            .toList();
+                    filterList = employeeService.getchkStartsWithList(filterList,field,text);  
                     break;
                 case 6:
-                      filterList = filterList.stream()
-                            .filter(emp -> ((String)getters.get(field).apply(emp)).endsWith(text))
-                            .toList();
+                    filterList = employeeService.getchkEndsWithList(filterList,field,text);  
                     break;
                 default:
                     break;
@@ -234,22 +228,22 @@ public class EmployeeView {
             case 1:
                 System.out.print("Enter the name:");
                 String name = sc.next();
-                updateName(name);
+                employeeService.updateName(filterList,name);
                 break;
             case 2:
                 System.out.print("Enter the Age:");
                 int age = sc.nextInt();
-                updateAge(age);
+                employeeService.updateAge(filterList,age);
                 break;
             case 3:
                 System.out.print("Enter the Department:");
                 String dept = sc.next();
-                updateDept(dept);
+                employeeService.updateDept(filterList,dept);
                 break;
             case 4:
                 System.out.print("Enter the Designation:");
                 String desg = sc.next();
-                updateDesg(desg);
+                employeeService.updateDesg(filterList,desg);
                 break;
             case 0:
                 return;
@@ -259,25 +253,7 @@ public class EmployeeView {
         System.out.println("Updated Successfully!!!");
     }
 
-    private void updateName(String name) {
-        for(Employee emp:filterList)
-            emp.setEmployeeName(name);
-    }
-
-    private void updateAge(int age) {
-        for(Employee emp:filterList)
-            emp.setAge(age);
-    }
-
-    private void updateDept(String dept) {
-        for(Employee emp:filterList)
-            emp.setDepartment(dept);
-    }
-
-    private void updateDesg(String desg) {
-        for(Employee emp:filterList)
-            emp.setDesignation(desg);
-    }
+ 
 
     public void displayEmployeeUnderManager() {
         System.out.println("Select the Manager");
@@ -286,18 +262,20 @@ public class EmployeeView {
             if(employee.getReportingTo() != null)
                 mgmrSet.add(employee.getReportingTo());
         List<Employee> mgmrList = new ArrayList<>(mgmrSet);
-        System.out.println(mgmrList.size());
-        for(int i=0;i<mgmrList.size();i++)
-            System.out.println(i+1+"."+mgmrList.get(i).getEmployeeName());
-        System.out.println("Make the choice");
-        int n = sc.nextInt();
-        System.out.println("All Employees Under The Manager");
-        List<Employee> empList = employeeService.getAllEmpList().stream()
-                                .filter(a->(a.getReportingTo() != null && 
-                                a.getReportingTo().getEmployeeId() == mgmrList.get(n-1).getEmployeeId()))
-                                .toList();
-        for(Employee emp:empList)
-            System.out.println(emp);
+        if(!mgmrList.isEmpty())
+        {
+            for(int i=0;i<mgmrList.size();i++)
+                System.out.println(i+1+"."+mgmrList.get(i).getEmployeeName());
+            System.out.println("Make the choice");
+            int n = sc.nextInt();
+            System.out.println("All Employees Under The Manager");
+            List<Employee> empList = employeeService.getAllEmpList().stream()
+                                    .filter(a->(a.getReportingTo() != null && 
+                                    a.getReportingTo().getEmployeeId() == mgmrList.get(n-1).getEmployeeId()))
+                                    .toList();
+            for(Employee emp:empList)
+                System.out.println(emp);
+        }        
     }
 
 }

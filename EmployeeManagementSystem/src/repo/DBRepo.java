@@ -1,7 +1,10 @@
+package repo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import model.Employee;
 
 public class DBRepo {
     private Map<Integer,Employee> empList = new HashMap<>();

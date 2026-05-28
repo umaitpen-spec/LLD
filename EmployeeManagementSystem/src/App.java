@@ -2,6 +2,11 @@
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import model.Employee;
+import repo.DBRepo;
+import service.EmployeeService;
+import view.EmployeeView;
+
 public class App {      
     
     public static void main(String[] args) throws Exception {
@@ -50,7 +55,7 @@ public class App {
             }
             finally
             {
-                sc.next();
+                
             }
         }   
     }
