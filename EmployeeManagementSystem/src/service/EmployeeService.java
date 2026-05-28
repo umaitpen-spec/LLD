@@ -50,6 +50,8 @@ public class EmployeeService {
 
     public boolean chkStartsWith(String str1,String key)
     {
+        str1 = str1.toLowerCase();
+        key = key.toLowerCase();
         return str1.charAt(0) == key.charAt(0) && str1.substring(0,key.length()).equals(key);
     }
 
@@ -57,6 +59,8 @@ public class EmployeeService {
     {
         int n = key.length();
         int m = str1.length();
+        str1 = str1.toLowerCase();
+        key = key.toLowerCase();
         return str1.charAt(m-n) == key.charAt(0) && str1.substring(m-n,m-n+key.length()).equals(key);
     }
 
@@ -96,23 +100,19 @@ public class EmployeeService {
                         .toList();
     }
 
-    public void updateName(List<Employee> filterList,String name) {
-    for(Employee emp:filterList)
+    public void updateName(Employee emp,String name) {
         emp.setEmployeeName(name);
 }
 
-    public void updateAge(List<Employee> filterList,int age) {
-        for(Employee emp:filterList)
+    public void updateAge(Employee emp,int age) {
             emp.setAge(age);
     }
 
-    public void updateDept(List<Employee> filterList,String dept) {
-        for(Employee emp:filterList)
+    public void updateDept(Employee emp,String dept) {
             emp.setDepartment(dept);
     }
 
-    public void updateDesg(List<Employee> filterList,String desg) {
-        for(Employee emp:filterList)
+    public void updateDesg(Employee emp,String desg) {
             emp.setDesignation(desg);
     }
 

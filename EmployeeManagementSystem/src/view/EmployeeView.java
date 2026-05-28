@@ -47,7 +47,7 @@ public class EmployeeView {
                 //System.out.println("5.ReportingTo");
                 System.out.println("0.Exit");
                 int choice = sc.nextInt();
-
+                sc.nextLine();
                 switch(choice) {
                     case 2:
                         filterInt(choice);
@@ -78,6 +78,7 @@ public class EmployeeView {
             }
             catch(InputMismatchException ex)
             {
+                 sc.nextLine();
                 System.out.println("Enter Only NUmbers");
             }
             catch(Exception ex)
@@ -93,51 +94,63 @@ public class EmployeeView {
     }
 
     public void filterInt(int choice) {
-        String str = null;
-        switch (choice) {
-          
-            case 2:
-                str = "age:";
-                break;
-            default:
-                System.out.println("Wrong Choice!!");
-        }
-        System.out.print("Enter the "+str);
-        int num = sc.nextInt();
-        System.out.println("Enter the filter Options");
-        System.out.println("1.Equal");
-        System.out.println("2.Not Equal");
-        System.out.println("3.Greater Than");
-        System.out.println("4.Less Than");
-        int filterChoice = sc.nextInt();
-        
-            switch (filterChoice) {
-                case 1:
-                    filterList = filterList.stream()
-                            .filter(a->a.getAge() == num)
-                            .collect(Collectors.toList());
-                    break;
+        try
+        {
+            String str = null;
+            switch (choice) {
+            
                 case 2:
-                    filterList = filterList.stream()
-                            .filter(a->a.getAge() != num)
-                            .collect(Collectors.toList());
-                    break;
-                case 3:
-                    filterList = filterList.stream()
-                            .filter(a->a.getAge() > num)
-                            .collect(Collectors.toList());
-                    break;
-                case 4:
-                    filterList = filterList.stream()
-                            .filter(a->a.getAge() < num)
-                            .collect(Collectors.toList());
+                    str = "age:";
                     break;
                 default:
-                    break;
+                    System.out.println("Wrong Choice!!");
+                    return;
+            }
+            System.out.print("Enter the "+str);
+            int num = sc.nextInt();
+            System.out.println("Enter the filter Options");
+            System.out.println("1.Equal");
+            System.out.println("2.Not Equal");
+            System.out.println("3.Greater Than");
+            System.out.println("4.Less Than");
+            int filterChoice = sc.nextInt();
+             sc.nextLine();
             
+                switch (filterChoice) {
+                    case 1:
+                        filterList = filterList.stream()
+                                .filter(a->a.getAge() == num)
+                                .collect(Collectors.toList());
+                        break;
+                    case 2:
+                        filterList = filterList.stream()
+                                .filter(a->a.getAge() != num)
+                                .collect(Collectors.toList());
+                        break;
+                    case 3:
+                        filterList = filterList.stream()
+                                .filter(a->a.getAge() > num)
+                                .collect(Collectors.toList());
+                        break;
+                    case 4:
+                        filterList = filterList.stream()
+                                .filter(a->a.getAge() < num)
+                                .collect(Collectors.toList());
+                        break;
+                    default:
+                        sc.next();
+                        System.out.println("Wrong Choice!!");
+                        return;
+                
+            }
+        // sc.next();
+            displayFilterEmp();
         }
-        
-        displayFilterEmp();
+        catch(Exception ex)
+        {
+             sc.nextLine();
+            System.out.println("Enter Only Numbers!!!");
+        }
     }
 
     public void displayFilterEmp()
@@ -161,96 +174,130 @@ public class EmployeeView {
     }
 
      public void filterString(int choice) {
-        String field;
-        if (choice == 1)                 
-            field = "Name";                
-        else if(choice == 3)
-                field = "Department";
-        else if(choice == 4)
-                field = "Designation";
-        else if(choice ==  5)
-                field = "ReportingTo";
-        else
+        try
         {
-            System.out.println("Wrong Choice!!");
-            return;
+            String field;
+            if (choice == 1)                 
+                field = "Name";                
+            else if(choice == 3)
+                    field = "Department";
+            else if(choice == 4)
+                    field = "Designation";
+            else if(choice ==  5)
+                    field = "ReportingTo";
+            else
+            {
+                System.out.println("Wrong Choice!!");
+                sc.next();
+                return;
+            }
+            
+            System.out.print("Enter the "+field+":");
+            String  text = sc.next();
+            System.out.println("Enter the filter Options");
+            System.out.println("1.Equal");
+            System.out.println("2.Not Equal");
+            System.out.println("3.Contains");
+            System.out.println("4.Not Contains");
+            System.out.println("5.Starts With");
+            System.out.println("6.Ends With");
+            int filterChoice = sc.nextInt();
+             sc.nextLine();
+            switch (filterChoice) {
+                    case 1:
+                        filterList = employeeService.getEqualList(filterList,field,text);                    
+                        break;
+                    case 2:
+                        filterList = employeeService.getNotEqualList(filterList,field,text); 
+                    
+                        break;
+                    case 3:
+                        filterList =  employeeService.getContainsList(filterList,field,text); 
+                        break;
+                    case 4:
+                        filterList =  employeeService.getNotContainsList(filterList,field,text);                              
+                        break;
+                    case 5:
+                        filterList = employeeService.getchkStartsWithList(filterList,field,text);  
+                        break;
+                    case 6:
+                        filterList = employeeService.getchkEndsWithList(filterList,field,text);  
+                        break;
+                    default:
+                        sc.nextLine();
+                        System.out.println("Wrong Choice!!");
+                        return;
+                
+            }
+            displayFilterEmp();
         }
-        
-        System.out.print("Enter the "+field+":");
-        String  text = sc.next();
-        System.out.println("Enter the filter Options");
-        System.out.println("1.Equal");
-        System.out.println("2.Not Equal");
-        System.out.println("3.Contains");
-        System.out.println("4.Not Contains");
-        System.out.println("5.Starts With");
-        System.out.println("6.Ends With");
-        int filterChoice = sc.nextInt();
-        
-        switch (filterChoice) {
-                case 1:
-                    filterList = employeeService.getEqualList(filterList,field,text);                    
-                    break;
-                case 2:
-                    filterList = employeeService.getNotEqualList(filterList,field,text); 
-                   
-                    break;
-                case 3:
-                    filterList =  employeeService.getContainsList(filterList,field,text); 
-                    break;
-                case 4:
-                    filterList =  employeeService.getNotContainsList(filterList,field,text);                              
-                    break;
-                case 5:
-                    filterList = employeeService.getchkStartsWithList(filterList,field,text);  
-                    break;
-                case 6:
-                    filterList = employeeService.getchkEndsWithList(filterList,field,text);  
-                    break;
-                default:
-                    break;
+        catch(Exception ex)
+        {
+             sc.nextLine();
+            System.out.println("Enter Only Numbers");
             
         }
-        displayFilterEmp();
      }
 
     private void updateEmployees() {
-        System.out.println("Enter the field u want to update");
-        System.out.println("1.Employee Name");
-        System.out.println("2.Age");
-        System.out.println("3.Department");
-        System.out.println("4.Designation");
-        //System.out.println("5.ReportingTo");
-        System.out.println("0.Exit");
-        int choice = sc.nextInt();
-
-        switch(choice) {
-            case 1:
-                System.out.print("Enter the name:");
-                String name = sc.next();
-                employeeService.updateName(filterList,name);
-                break;
-            case 2:
-                System.out.print("Enter the Age:");
-                int age = sc.nextInt();
-                employeeService.updateAge(filterList,age);
-                break;
-            case 3:
-                System.out.print("Enter the Department:");
-                String dept = sc.next();
-                employeeService.updateDept(filterList,dept);
-                break;
-            case 4:
-                System.out.print("Enter the Designation:");
-                String desg = sc.next();
-                employeeService.updateDesg(filterList,desg);
-                break;
-            case 0:
+        try
+        {
+            System.out.print("Enter the EmployeeId to update:");
+            int empId = sc.nextInt();
+            Employee empUpdate = employeeService.getEmployeeById(empId);
+            if(empUpdate == null)
+            {
+                System.out.println("No Employee Found");
                 return;
-            default:
-                System.out.println("Wrong Choice!!!");
+            }
+            System.out.println("Enter the field u want to update");
+            System.out.println("1.Employee Name");
+            System.out.println("2.Age");
+            System.out.println("3.Department");
+            System.out.println("4.Designation");
+            //System.out.println("5.ReportingTo");
+            System.out.println("0.Exit");
+            int choice = sc.nextInt();
+             sc.nextLine();
+            switch(choice) {
+                case 1:
+                    System.out.print("Enter the name:");
+                    String name = sc.next();
+                    if(name.length() >= 3 && name.length() < 50)
+                        employeeService.updateName(empUpdate,name);
+                    else
+                        System.out.println("Name should be more than 3 and < 50");
+                    break;
+                case 2:
+                    System.out.print("Enter the Age:");
+                    int age = sc.nextInt();
+                    if(age > 0 && age < 120)
+                        employeeService.updateAge(empUpdate,age);
+                    else
+                        System.out.println("Enter Valid Age");
+                    break;
+                case 3:
+                    System.out.print("Enter the Department:");
+                    String dept = sc.next();
+                    employeeService.updateDept(empUpdate,dept);
+                    break;
+                case 4:
+                    System.out.print("Enter the Designation:");
+                    String desg = sc.next();
+                    employeeService.updateDesg(empUpdate,desg);
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Wrong Choice!!!");
+            }
+            System.out.println("Updated Successfully!!!");
         }
-        System.out.println("Updated Successfully!!!");
+        catch(Exception ex)
+        {
+             sc.nextLine();
+            System.out.println("Enter Only Numbers");
+        }
     }
 
  

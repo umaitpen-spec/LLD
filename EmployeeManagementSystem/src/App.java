@@ -1,7 +1,6 @@
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
-
 import model.Employee;
 import repo.DBRepo;
 import service.EmployeeService;
@@ -21,11 +20,12 @@ public class App {
 
             while (true) { 
             try{
-                System.out.println("Enter the option of ut choice:");
+               
                 System.out.println("1.View All Employee");
                 System.out.println("2. Filter and Update Employee Details");
                 System.out.println("3. Display Employee Under Manager");
                 System.out.println("0.Exit");
+                System.out.println("Enter the option of ut choice:");
                 int choice = sc.nextInt();
 
                 switch (choice) {
@@ -47,6 +47,7 @@ public class App {
             catch(InputMismatchException ex)
             {
                 System.out.println("Enter Only NUmbers");
+                sc.next();
             }
             catch(Exception ex)
             {
