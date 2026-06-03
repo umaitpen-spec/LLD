@@ -1,9 +1,8 @@
 import java.util.*;
 
 public class App {
+    static int totCount;
     public static void main(String[] args) {
-        try
-        {
             System.out.println("Welcome to Minesweeper Game");
             Scanner sc  = new Scanner(System.in);
             char[][] board = {
@@ -21,24 +20,39 @@ public class App {
 
             int n = board.length,m = board[0].length;
             char[][] result = new char[n][m];
+            totCount = 0;
             for(int i=0;i<n;i++)
-                Arrays.fill(result[i],'#');
+                for(int j=0;j<m;j++)
+                {
+                    result[i][j] = '#';
+                    if(board[i][j] != '*')
+                        totCount++;
+                }
         
             while(true)
             {
-                displayGrid(result);
-                System.out.print("Enter the row:");
-                int row = sc.nextInt();
-                System.out.print("Enter the col:");
-                int col = sc.nextInt();
-                makeMove(board,result,row,col);
+                try
+                {            
+                    displayGrid(result);
+                    System.out.print("Enter the row:");
+                    int row = sc.nextInt();
+                    System.out.print("Enter the col:");
+                    int col = sc.nextInt();
+                    makeMove(board,result,row,col);
+                }
+                catch(Exception ex)
+                {
+                    System.out.println(ex.getMessage());
+                    if(ex.getMessage().equals("Game Over"))
+                        return;
+                }
+                if(totCount == 0)
+                {
+                    System.out.println("Won The Game!!!");
+                    return;
+                }
             }
-        }
-        catch(Exception ex)
-        {
-            System.out.println(ex.getMessage());
-        }
-    }
+        }      
 
     private static void makeMove(char[][] board,char[][] result, int row, int col) throws Exception {
         int[] dx = {-1,-1,-1,0,0,1,1,1};
@@ -54,15 +68,18 @@ public class App {
             return;
         }            
         if(board[row][col] == '*')
+        {
+            finalGrid(result,board);
             throw new Exception("Game Over");
+        }
         else
         {
             int countNei = calculateNei(board,row,col);
             result[row][col] = (char) ('0' + countNei) ;
+            totCount--;
             Queue<int[]> q = new LinkedList<>();
             if(countNei == 0)
                 q.add(new int[]{row,col});
-            //System.out.println(q.size());
             while(!q.isEmpty())
             {
                 int[] node = q.remove();
@@ -71,10 +88,12 @@ public class App {
                 {
                     int i = node[0] + dx[k];
                     int j = node[1] + dy[k];
-                    if(i>=0 && i<n && j>=0 && j<m && result[i][j] == '#')
+                    if(i>=0 && i<n && j>=0 && j<m && (result[i][j] == '#' && board[i][j] != '*'))
                     {
                         countNei = calculateNei(board, i, j);
+                        
                         result[i][j] = (char) ('0' + countNei) ;
+                        totCount--;
                         if(countNei == 0)
                             q.add(new int[]{i,j});
                     }
@@ -82,7 +101,6 @@ public class App {
 
             }
         }
-        
     }
 
     private static int calculateNei(char[][] board, int row, int col) {
@@ -112,5 +130,14 @@ public class App {
         }
     }
 
+    private static void finalGrid(char[][] result,char[][] board)
+    {
+        int n = result.length,m = result[0].length;
+        for(int i=0;i<n;i++)
+            for(int j=0;j<m;j++)
+                if(board[i][j] == '*')
+                    result[i][j] = '*';
+        displayGrid(result);
+    }
 
 }
