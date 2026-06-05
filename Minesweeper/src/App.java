@@ -2,22 +2,34 @@ import java.util.*;
 
 public class App {
     static int totCount;
+    private enum level {LOW,MEDIUM,HIGH}
     public static void main(String[] args) {
             System.out.println("Welcome to Minesweeper Game");
-            Scanner sc  = new Scanner(System.in);
-            char[][] board = {
-            {'.', '.', '.', '*', '.', '.', '.', '.', '.', '.'},
-            {'.', '*', '.', '.', '.', '.', '*', '.', '.', '.'},
-            {'.', '.', '.', '.', '*', '.', '.', '.', '*', '.'},
-            {'*', '.', '.', '.', '.', '.', '.', '.', '.', '.'},
-            {'.', '.', '*', '.', '.', '*', '.', '.', '.', '.'},
-            {'.', '.', '.', '.', '.', '.', '.', '*', '.', '.'},
-            {'.', '*', '.', '.', '.', '.', '.', '.', '.', '*'},
-            {'.', '.', '.', '*', '.', '.', '.', '.', '.', '.'},
-            {'.', '.', '.', '.', '.', '*', '.', '.', '.', '.'},
-            {'*', '.', '.', '.', '.', '.', '.', '*', '.', '.'}
-            };
+            try (Scanner sc = new Scanner(System.in)) {
+            char[][] board;
 
+            System.out.print("Enter the number of rows:");
+            int totrow = sc.nextInt();
+            System.out.print("Enter the number of cols:");
+            int totcol = sc.nextInt();
+            System.out.println("Enter the difficulty level. 1.Low,2.Medium,3.High");
+            int lenelno = sc.nextInt();
+            level levelStr = level.LOW;
+            switch (lenelno) {
+                case 1:
+                    levelStr = level.LOW;
+                    break;
+                case 2:
+                    levelStr = level.MEDIUM;
+                    break;
+                case 3:
+                    levelStr = level.HIGH;
+                    break;
+                default:
+                    levelStr = level.LOW;
+                    break;
+            }
+            board = generateInput(totrow,totcol,levelStr);
             int n = board.length,m = board[0].length;
             char[][] result = new char[n][m];
             totCount = 0;
@@ -52,7 +64,34 @@ public class App {
                     return;
                 }
             }
-        }      
+        }
+    }
+
+    private static char[][] generateInput(int row, int col, level levelStr) {
+        char[][] board = new char[row][col];
+        int levelNo = 0;
+        if(levelStr == level.LOW)
+            levelNo = 6;
+        else if(levelStr == level.MEDIUM)
+            levelNo = 5;
+        else if(levelStr == level.HIGH)
+            levelNo = 4;
+        int mines = row * col /levelNo;
+        for(int i=0;i<row;i++)
+            Arrays.fill(board[i],'#');
+        Random random = new Random();
+        for(int i=0;i<mines;)
+        {
+            int r = random.nextInt(row);
+            int c = random.nextInt(col);
+            if(board[r][c] == '#')
+            {
+                board[r][c] = '*';
+                i++;
+            }
+        }
+        return  board;
+    }
 
     private static void makeMove(char[][] board,char[][] result, int row, int col) throws Exception {
         int[] dx = {-1,-1,-1,0,0,1,1,1};
